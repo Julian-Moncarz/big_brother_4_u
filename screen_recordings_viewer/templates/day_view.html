@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordings for {{ date_formatted }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Recordings for {{ date_formatted }}</h1>
+    </header>
+    <div class="container">
+        <h2>Videos</h2>
+        {% if recordings %}
+            <ul class="video-list">
+                {% for recording in recordings %}
+                    <li>
+                        <div class="video-info">
+                            <strong>{{ recording.display_name }}</strong><br>
+                            Duration: {{ recording.duration_formatted }} <br>
+                            Size: {{ recording.size_formatted }}
+                        </div>
+                        <video controls preload="metadata">
+                            <source src="{{ url_for('serve_recording', session_folder_name=recording.session_folder, filename=recording.filename) }}#t=0.1" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="playback-controls">
+                            <label for="speed-{{ loop.index }}">Speed:</label>
+                            <input type="range" id="speed-{{ loop.index }}" class="speed-slider" min="1" max="20" value="1" step="0.5" aria-label="Playback speed">
+                            <span class="speed-display">1.0x</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-recordings">No recordings found for this day.</p>
+        {% endif %}
+        <a href="{{ url_for('index') }}" class="back-link">Back to Timeline</a>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoContainers = document.querySelectorAll('.video-list li');
+
+            videoContainers.forEach(container => {
+                const video = container.querySelector('video');
+                const speedSlider = container.querySelector('.speed-slider');
+                const speedDisplay = container.querySelector('.speed-display');
+
+                if (video && speedSlider && speedDisplay) {
+                    // Set initial display value
+                    const initialSpeed = parseFloat(speedSlider.value);
+                    speedDisplay.textContent = `${initialSpeed.toFixed(1)}x`;
+
+                    // Update on input
+                    speedSlider.addEventListener('input', () => {
+                        const speed = parseFloat(speedSlider.value);
+                        video.playbackRate = speed;
+                        speedDisplay.textContent = `${speed.toFixed(1)}x`;
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

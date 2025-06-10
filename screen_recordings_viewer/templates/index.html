@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Recordings Timeline</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Screen Recordings Timeline</h1>
+    </header>
+    <div class="container">
+        <h2>Recorded Days</h2>
+        {% if days_with_recordings %}
+            <ul class="timeline-list">
+                {% for day_info in days_with_recordings %}
+                    <li>
+                        <a href="{{ url_for('view_day', date_str=day_info.date) }}">
+                            {{ day_info.date_formatted }}
+                        </a>
+                        <div class="details">Recordings: {{ day_info.count }} | Total Duration: {{ day_info.total_duration_formatted }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-recordings">No recordings found in the '<code>{{ recordings_dir_name }}</code>' directory (expected at <code>{{ recordings_base_path }}</code>).</p>
+            <p>Please make sure your recordings are processed into <code>recording.mp4</code> files within session subfolders (e.g., <code>YYYYMMDD_HHMMSS/recording.mp4</code>) inside the <code>{{ recordings_dir_name }}</code> directory (expected at <code>{{ recordings_base_path }}</code>).</p>
+            <p>If you see session folders with only <code>.jpg</code> frames, it means the video conversion step (<code>python screen_recorder.py --convert path/to/session_folder</code> or automatic conversion) may not have completed successfully for those sessions.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
