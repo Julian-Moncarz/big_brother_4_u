@@ -262,11 +262,18 @@ def main():
     try:
         # Start recording
         recorder.start_recording()
-        
-        # Keep main thread alive
+
+        # Keep main thread alive, but exit after 4 hours
+        start_time = time.time()
+        four_hours = 4 * 60 * 60  # 14400 seconds
+
         while recorder.recording:
+            if time.time() - start_time > four_hours:
+                print("⏳ 4-hour limit reached. Shutting down to restart.")
+                recorder.stop_recording()
+                break  # Exit the loop, allowing the script to terminate
             time.sleep(1)
-            
+
     except KeyboardInterrupt:
         pass  # Handled by signal handler
 
